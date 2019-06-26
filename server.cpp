@@ -1,5 +1,6 @@
 #include <map>
 #include "header.h"
+
 using std::map;
 
 map<int, struct sockaddr_in*> socks;         // 用于记录各个客户端，键是与客户端通信 socket 的文件描述符，值是对应的客户端的 sockaddr_in 的信息
@@ -33,19 +34,23 @@ void* recv_func(void* args)
 }
 
 // 和某一个客户端通信的线程函数
-void* process(void *argv)
+void* process(void* args)
 {
-    pthread_t td;
-    pthread_create(&td, NULL, recv_func, (void*)argv);         // 在主处理函数中再新开一个线程用于接收该客户端的消息
+    //pthread_t td;
+    //pthread_create(&td, NULL, recv_func, (void*)argv);         // decrease number of thread
 
-    int sc = *(int*)argv;
+    //int sc = *(int*)argv;                                     //port
     char buf[BUF_LEN];
+    char bufs[BUF_LEN]={'s','e','r','v','e','r',':'};
+    //bufs={'s','e','r','v','e','r',':'};
     while(true) {
         int n = read(STDIN_FILENO, buf, BUF_LEN);
-        buf[n++] = '\0';                // 和客户端一样需要自己手动添加字符串结束符
-        send_all(buf, n);               // 服务端自己的信息输入需要发给所有客户端
+        strcat(bufs,buf);
+        n+=6;
+        bufs[n++] = '\0';                // 和客户端一样需要自己手动添加字符串结束符
+        send_all(bufs, n);               // 服务端自己的信息输入需要发给所有客户端
     }
-    close(sc);
+    //close(sc);                                                //close port
 }
 
 int main(int argc, char *argv[])
@@ -74,6 +79,8 @@ int main(int argc, char *argv[])
 
     socks.clear();          // 清空 map
     socklen_t len = sizeof(struct sockaddr);
+    pthread_t td;
+    pthread_create(&td, NULL, process ,NULL);       // 开一个线程来和all客户端进行交互
 
     while(true) {
         struct sockaddr_in *cli_addr = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
@@ -92,8 +99,11 @@ int main(int argc, char *argv[])
         socks[sc] = cli_addr;                        // 指向对应申请到的 sockaddr_in 空间
         printf("client %d connect me...\n", sc);
 
+        //pthread_t td;
+        //pthread_create(&td, NULL, process, (void*)&sc);       // only execute once
         pthread_t td;
-        pthread_create(&td, NULL, process, (void*)&sc);       // 开一个线程来和 accept 的客户端进行交互
+        pthread_create(&td, NULL, recv_func, (void*)&sc);         // 在主处理函数中开一个线程用于接收该客户端的消息
     }
+    close(*(int*)argv);
     return 0;
 }

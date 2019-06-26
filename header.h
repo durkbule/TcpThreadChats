@@ -13,6 +13,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <assert.h>
+#include <string>
 
 #include <pthread.h>
 

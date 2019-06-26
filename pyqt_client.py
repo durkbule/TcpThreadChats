@@ -7,6 +7,7 @@ import socket
 import _thread
 
 
+
 class MyThread(QtCore.QThread):
 
 	def __init__(self, win):
@@ -34,6 +35,7 @@ class Client(QtWidgets.QWidget):
 	def __init__(self, parent=None):
 
 		QtWidgets.QWidget.__init__(self, parent)
+		# qRegisterMetaType < QtextCursor > ();
 
 		self.setWindowTitle(u'TCP客户端')
 		self.resize(600, 500)
@@ -139,8 +141,8 @@ class Client(QtWidgets.QWidget):
 			if not data or not len(data):
 				break
 			data = data[:-1]
-			self.txt_recvMessage.append(data)
-			#self.txt_recvMessage.append(data.decode('utf8'))	# 很重要
+			#self.txt_recvMessage.append(data)
+			self.txt_recvMessage.append(data.decode('utf8'))	# 很重要
 		self.disConnect()
 
 	def myClearRecvMessage(self):
@@ -154,10 +156,11 @@ class Client(QtWidgets.QWidget):
 			data = self.txt_name.text()
 			if data == '':
 				data = u'[匿名]'
-			data =  str((data + ': ' + self.txt_sendMessage.text() + '\n'))
+			data =  str((data + ': ' + self.txt_sendMessage.text() + '\n')).encode('utf8')
+
 			#data =  str((data + ': ' + self.txt_sendMessage.text() + '\n').toUtf8())
 		else:
-			data =  str((self.txt_sendMessage.text() + '\n'))
+			data =  str((self.txt_sendMessage.text() + '\n')).encode('utf8')
 		try:
 			self.client_socket.sendall(data)
 		except:
