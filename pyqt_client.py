@@ -52,7 +52,7 @@ class Client(QtWidgets.QWidget):
 
 		self.isConnected = False
 		self.btn_connect = QtWidgets.QPushButton(u'连接')
-		self.btn_connect.clicked.connect(self.myConnect())
+		self.btn_connect.clicked.connect(lambda:self.myConnect())
 		#self.connect(self.btn_connect, QtCore.SIGNAL(
 			#'clicked()'), self.myConnect)
 		layout.addWidget(self.btn_connect, 0, 8, 1, 2)
@@ -61,7 +61,7 @@ class Client(QtWidgets.QWidget):
 		layout.addWidget(label_recvMessage, 1, 0, 1, 1)
 
 		self.btn_clearRecvMessage = QtWidgets.QPushButton(u'↓ 清空消息框')
-		self.btn_clearRecvMessage.clicked.connect(self.myClearRecvMessage())
+		self.btn_clearRecvMessage.clicked.connect(lambda:self.myClearRecvMessage())
 		#self.connect(self.btn_clearRecvMessage, QtCore.SIGNAL(
 			#'clicked()'), self.myClearRecvMessage)
 		layout.addWidget(self.btn_clearRecvMessage, 1, 7, 1, 3)
@@ -87,17 +87,17 @@ class Client(QtWidgets.QWidget):
 		self.txt_sendMessage.setStyleSheet("background-color:cyan")
 		layout.addWidget(self.txt_sendMessage, 4, 1, 1, 7)
 		self.btn_send = QtWidgets.QPushButton(u'发送')
-		self.btn_send.clicked.connect(self.myConnect)
+		self.btn_send.clicked.connect(lambda:self.mySend())
 		#self.connect(self.btn_send, QtCore.SIGNAL('clicked()'), self.mySend)
 		layout.addWidget(self.btn_send, 4, 8, 1, 2)
 
 		self.btn_clearSendMessage = QtWidgets.QPushButton(u'↑ 清空输入框')
-		self.btn_clearSendMessage.clicked.connect(self.myClearSendMessage)
+		self.btn_clearSendMessage.clicked.connect(lambda:self.myClearSendMessage())
 		#self.connect(self.btn_clearSendMessage, QtCore.SIGNAL(
 			#'clicked()'), self.myClearSendMessage)
 		layout.addWidget(self.btn_clearSendMessage, 5, 6, 1, 2)
 		self.btn_quit = QtWidgets.QPushButton(u'退出')
-		self.btn_quit.clicked.connect(self.my.Quit)
+		self.btn_quit.clicked.connect(lambda:self.myQuit())
 		#self.connect(self.btn_quit, QtCore.SIGNAL('clicked()'), self.myQuit)
 		layout.addWidget(self.btn_quit, 5, 8, 1, 2)
 
@@ -139,7 +139,8 @@ class Client(QtWidgets.QWidget):
 			if not data or not len(data):
 				break
 			data = data[:-1]
-			self.txt_recvMessage.append(data.decode('utf8'))	# 很重要
+			self.txt_recvMessage.append(data)
+			#self.txt_recvMessage.append(data.decode('utf8'))	# 很重要
 		self.disConnect()
 
 	def myClearRecvMessage(self):
@@ -153,9 +154,10 @@ class Client(QtWidgets.QWidget):
 			data = self.txt_name.text()
 			if data == '':
 				data = u'[匿名]'
-			data =  str((data + ': ' + self.txt_sendMessage.text() + '\n').toUtf8())
+			data =  str((data + ': ' + self.txt_sendMessage.text() + '\n'))
+			#data =  str((data + ': ' + self.txt_sendMessage.text() + '\n').toUtf8())
 		else:
-			data =  str((self.txt_sendMessage.text() + '\n').toUtf8())
+			data =  str((self.txt_sendMessage.text() + '\n'))
 		try:
 			self.client_socket.sendall(data)
 		except:

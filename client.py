@@ -3,7 +3,7 @@
 
 import socket
 import sys
-import thread
+import _thread
 
 BUF_LEN = 1024
 
@@ -16,13 +16,13 @@ def recv_func(client):
             break
         if not data or not len(data):
             break
-        print data
+        print(data)
     client.close()
     sys.exit(0)
 
 
 def process(client):
-    thread.start_new_thread(recv_func, (client, ))
+    _thread.start_new_thread(recv_func, (client, ))
     while True:
         try:
             data = raw_input()
@@ -36,7 +36,7 @@ def process(client):
     sys.exit(0)
 
 if len(sys.argv) != 3:
-    print 'Usage: ./client.py [ip] [port]'
+    print('Usage: ./client.py [ip] [port]')
     sys.exit(1)
 
 HOST = sys.argv[1]
